@@ -13,7 +13,7 @@ type ProcessMessageContext = {
     getMessage: SocketConfig['getMessage'];
 };
 /** Cleans a received message to further processing */
-export declare const cleanMessage: (message: WAMessage, meId: string, meLid: string) => void;
+export declare const cleanMessage: (message: WAMessage, meId: string, meLid: string, lidMappingStore?: any) => Promise<void>;
 export declare const isRealMessage: (message: WAMessage) => boolean;
 export declare const shouldIncrementChatUnread: (message: WAMessage) => boolean;
 /**

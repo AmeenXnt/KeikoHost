@@ -143,6 +143,8 @@ export type ButtonReplyInfo = {
     displayText: string;
     id: string;
     index: number;
+    text?: string;
+    nativeFlow?: proto.Message.InteractiveResponseMessage.INativeFlowResponseMessage;
 };
 export type GroupInviteInfo = {
     inviteCode: string;
@@ -154,10 +156,60 @@ export type GroupInviteInfo = {
 export type WASendableProduct = Omit<proto.Message.ProductMessage.IProductSnapshot, 'productImage'> & {
     productImage: WAMediaUpload;
 };
+export interface Carousel {
+    image?: WAMediaUpload;
+    video?: WAMediaUpload;
+    product?: WASendableProduct;
+    title?: string;
+    caption?: string;
+    footer?: string;
+    buttons?: proto.Message.InteractiveMessage.NativeFlowMessage.NativeFlowButton[];
+}
+type Buttonable = {
+    /** add plain buttons to the message */
+    buttons?: proto.Message.ButtonsMessage.IButton[];
+    footer?: string;
+    title?: string;
+};
+type Templatable = {
+    /** add template buttons (conflicts with plain buttons) */
+    templateButtons?: proto.IHydratedTemplateButton[];
+    footer?: string;
+};
+type Interactiveable = {
+    /** add nativeFlow interactive buttons (conflicts with plain/template buttons) */
+    interactiveButtons?: proto.Message.InteractiveMessage.NativeFlowMessage.NativeFlowButton[];
+    title?: string;
+    subtitle?: string;
+    media?: boolean;
+};
+type Shopable = {
+    shop?: proto.Message.InteractiveMessage.ShopMessage.Surface;
+    id?: string;
+};
+type Collectionable = {
+    collection?: {
+        bizJid: string;
+        id?: string;
+        version?: number;
+    };
+};
+type Cardsable = {
+    /** carousel/cards message */
+    cards?: Carousel[];
+};
+type Listable = {
+    /** list sections */
+    sections?: proto.Message.ListMessage.ISection[];
+    /** Title of list */
+    title?: string;
+    /** Button text to open list */
+    buttonText?: string;
+};
 export type AnyRegularMessageContent = (({
     text: string;
     linkPreview?: WAUrlInfo | null;
-} & Mentionable & Contextable & Editable) | AnyMediaMessageContent | {
+} & Mentionable & Contextable & Editable & Buttonable & Templatable & Interactiveable & Shopable & Collectionable & Cardsable & Listable) | (AnyMediaMessageContent & Buttonable & Templatable & Interactiveable & Shopable & Collectionable & Cardsable) | {
     event: EventMessageOptions;
 } | ({
     poll: PollMessageOptions;
@@ -172,7 +224,7 @@ export type AnyRegularMessageContent = (({
     react: proto.Message.IReactionMessage;
 } | {
     buttonReply: ButtonReplyInfo;
-    type: 'template' | 'plain';
+    type: 'template' | 'plain' | 'interactive';
 } | {
     groupInvite: GroupInviteInfo;
 } | {
